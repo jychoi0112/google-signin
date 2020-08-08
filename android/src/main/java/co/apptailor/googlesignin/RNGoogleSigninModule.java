@@ -139,25 +139,24 @@ public class RNGoogleSigninModule extends ReactContextBaseJavaModule {
             rejectWithNullClientError(promise);
             return;
         }
-        if (promiseWrapper.setPromiseWithInProgressCheck(promise, "signInSilently")) {
-            UiThreadUtil.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Task<GoogleSignInAccount> result = _apiClient.silentSignIn();
-                    if (result.isSuccessful()) {
-                        // There's immediate result available.
-                        handleSignInTaskResult(result);
-                    } else {
-                        result.addOnCompleteListener(new OnCompleteListener() {
-                            @Override
-                            public void onComplete(Task task) {
-                                handleSignInTaskResult(task);
-                            }
-                        });
-                    }
-                }
-            });
-        }
+        promiseWrapper.setPromiseWithInProgressCheck(promise, "signInSilently");
+        UiThreadUtil.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Task<GoogleSignInAccount> result = _apiClient.silentSignIn();
+                if (result.isSuccessful()) {
+                    // There's immediate result available.
+                    handleSignInTaskResult(result);
+                } else {
+                    result.addOnCompleteListener(new OnCompleteListener() {
+                        @Override
+                        public void onComplete(Task task) {
+                            handleSignInTaskResult(task);
+                        }
+                    });
+                  }
+            }
+        });
     }
 
     private void handleSignInTaskResult(Task<GoogleSignInAccount> result) {
@@ -189,15 +188,14 @@ public class RNGoogleSigninModule extends ReactContextBaseJavaModule {
             promise.reject(MODULE_NAME, "activity is null");
             return;
         }
-        if (promiseWrapper.setPromiseWithInProgressCheck(promise, "signIn")) {
-            UiThreadUtil.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Intent signInIntent = _apiClient.getSignInIntent();
-                    activity.startActivityForResult(signInIntent, RC_SIGN_IN);
-                }
-            });
-        }
+        promiseWrapper.setPromiseWithInProgressCheck(promise, "signIn");
+        UiThreadUtil.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Intent signInIntent = _apiClient.getSignInIntent();
+                activity.startActivityForResult(signInIntent, RC_SIGN_IN);
+            }
+        });
     }
 
     private class RNGoogleSigninActivityEventListener extends BaseActivityEventListener {
@@ -283,9 +281,8 @@ public class RNGoogleSigninModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void clearCachedToken(String tokenToClear, Promise promise) {
-        if (promiseWrapper.setPromiseWithInProgressCheck(promise, "clearCachedToken")) {
-            new TokenClearingTask(this).execute(tokenToClear);
-        }
+        promiseWrapper.setPromiseWithInProgressCheck(promise, "clearCachedAccessToken");
+        new TokenClearingTask(this).execute(tokenToClear);
     }
 
     @ReactMethod
@@ -296,9 +293,8 @@ public class RNGoogleSigninModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        if (promiseWrapper.setPromiseWithInProgressCheck(promise, "getTokensAsync")) {
-            startTokenRetrievalTaskWithRecovery(account);
-        }
+        promiseWrapper.setPromiseWithInProgressCheck(promise, "getTokens");
+        startTokenRetrievalTaskWithRecovery(account);
     }
 
     private void startTokenRetrievalTaskWithRecovery(GoogleSignInAccount account) {
